@@ -18,7 +18,7 @@ An Elder Scrolls Online addon that extends the Outfit Styles panel with a favori
 
 ## Usage
 
-1. Open the **Outfit** panel (default: `C` → Outfit tab or the Outfit Styles panel)
+1. Open the **Outfit** panel (default: `U` → Outfit tab or the Outfit Styles panel)
 2. A **Show Favorites** checkbox appears on the header row next to "Show Locked"
 3. Right-click any style cell and choose **Add to Favorites** or **Remove from Favorites**
 4. Check **Show Favorites** to filter the grid to your favorited styles only
