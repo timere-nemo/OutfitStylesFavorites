@@ -11,3 +11,6 @@ desktop.ini
 *.tmp
 *.bak
 *~
+
+# Release archives
+releases/

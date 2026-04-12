@@ -1,0 +1,14 @@
+# Line ending normalization
+* text=auto
+release.sh text eol=lf
+
+# Files excluded from `git archive` output (release ZIP).
+# These are development/repository files — not needed by the game client or Minion.
+
+README.md       export-ignore
+CHANGELOG.md    export-ignore
+LICENSE         export-ignore
+CLAUDE.md       export-ignore
+.gitignore      export-ignore
+.gitattributes  export-ignore
+release.sh      export-ignore
