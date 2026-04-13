@@ -20,7 +20,7 @@ src/Favorites.lua           IsFavorite / AddFavorite / RemoveFavorite, SavedVars
 src/Filter.lua              RefreshVisible wrapper with AddEntry gating
 src/Checkbox.lua            "Show Favorites" checkbox creation and layout
 src/ContextMenu.lua         right-click menu injection via ShowMenu trampoline
-src/Highlight.lua           gold-star badge via PostHook on RefreshGridEntryMultiIcon
+src/Highlight.lua           separate CT_TEXTURE badge anchored TOPRIGHT; shown/hidden via PostHook
 ```
 
 **Load order matters.** `OutfitStylesFavorites.lua` must be listed first in the manifest so `OSF = {}` exists before sub-modules define methods on it. Each sub-module also declares `OSF = OSF or {}` for safety. `strings.lua` and `lang/*` must be loaded before any module that calls `GetString(...)` (e.g. `Checkbox.lua`, `ContextMenu.lua`), so all `SI_OSF_*` string IDs are registered before use.
@@ -66,7 +66,15 @@ The trampoline is only installed when the entry is a real, non-empty, non-clear 
 
 ## Visual highlight
 
-`ZO_PostHook` on `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:RefreshGridEntryMultiIcon`. The base method calls `ClearIcons()` first, so the star icon is always appended to a clean state. The hook skips entries when `OSF.showFavorites` is true (all visible entries are already favorites — highlighting is redundant).
+A dedicated `CT_TEXTURE` badge (`control.osfFavoriteBadge`) is created once per pooled control and anchored to `TOPRIGHT` at `DL_OVERLAY`. It is entirely independent of `statusMultiIcon` — ESO's own status icons (eye, lock) occupy the `TOPLEFT` area and are unaffected. An applied favorite shows both the ESO eye indicator and the star simultaneously.
+
+`ZO_PostHook` on `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:RefreshGridEntryMultiIcon` is used only as a refresh trigger. The hook does not touch `statusMultiIcon` or its icon set — it only calls `SetHidden` on `osfFavoriteBadge`. This avoids conflicts with `RefreshGridEntryMultiIcon`, which calls `ClearIcons()` and rebuilds the multi-icon on every refresh.
+
+The badge is hidden by default on creation. Every refresh path explicitly sets its hidden state, so pooled controls carry no stale visibility. `SetMouseEnabled(false)` prevents the badge from intercepting mouse events on the cell.
+
+Anchor offsets are chosen to visually align the badge with the eye icon: `statusMultiIcon` is 24×24 anchored `TOPLEFT` at `(3, 3)`, giving an eye center at `y=15`. A 20×20 badge needs `BADGE_INSET_Y=5` to match that center (`5+10=15`). `BADGE_INSET_X=3` mirrors the multi-icon's corner inset.
+
+The hook skips entries when `OSF.showFavorites` is true (all visible entries are already favorites — the badge is redundant).
 
 ## Checkbox layout
 

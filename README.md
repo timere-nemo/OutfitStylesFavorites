@@ -6,7 +6,7 @@ An Elder Scrolls Online addon that extends the Outfit Styles panel with a favori
 
 - **Show Favorites checkbox** — placed on the same header row as "Show Locked"; filters the grid to favorited styles only
 - **Context menu** — right-click any style cell to add or remove it from favorites
-- **Gold-star badge** — favorited entries are marked with a star icon when the filter is off, so favorites are always visible at a glance
+- **Gold-star badge** — favorited entries are marked with a star in the top-right corner of the cell; the ESO applied-style indicator (eye icon) remains unaffected and both can be visible at the same time
 - **Account-wide persistence** — favorites are stored per account (not per character), matching how outfit style unlocks work in ESO
 
 ## Installation
@@ -35,7 +35,7 @@ All UI strings use `SafeAddString` so other locale files can override them witho
 
 ## Notes
 
-- Favorites are stored **account-wide** via `ZO_SavedVars` — shared across all characters on the account, which matches how outfit style unlocks work in ESO
+- Favorites are stored **account-wide** — shared across all characters on the account, which matches how outfit style unlocks work in ESO
 - The "Show Favorites" filter is **session-only** — it always resets to off on login so you never open the panel to a silently filtered grid
 
 ## Development
