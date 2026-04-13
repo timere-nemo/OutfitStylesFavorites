@@ -7,32 +7,29 @@ Extends the ESO Outfit Styles panel with a favorites system.
 1. **"Show Favorites" checkbox** — placed on the same header row as "Show Locked"; filters the grid to favorited styles only
 2. **Context menu** — right-click a style cell to add or remove it from favorites
 3. **Visual highlight** — gold-star badge on favorited entries when the filter is off
-4. **Persistent storage** — favorites stored account-wide via `ZO_SavedVars`
+4. **Persistent storage** — favorites stored account-wide per server via `ZO_SavedVars`
 
 ## File structure
 
 ```
-OutfitStylesFavorites.lua   entry point — defines OSF, registers EVENT_ADD_ON_LOADED
-strings.lua                 SI_OSF_* string ID constants (200001–200003)
-lang/en.lua                 English string values — baseline for all locales (version 0)
-lang/ru.lua                 Russian string overrides (version 1, skipped for non-Russian clients)
+OutfitStylesFavorites.lua   entry point — defines OutfitStylesFavorites global, registers EVENT_ADD_ON_LOADED
+strings.lua                 SI_OSF_* IDs registered via ZO_CreateStringId (auto-allocated, English defaults)
+lang/ru.lua                 Russian overrides via SafeAddString version 1
 src/Favorites.lua           IsFavorite / AddFavorite / RemoveFavorite, SavedVars init
 src/Filter.lua              RefreshVisible wrapper with AddEntry gating
 src/Checkbox.lua            "Show Favorites" checkbox creation and layout
-src/ContextMenu.lua         right-click menu injection via ShowMenu trampoline
-src/Highlight.lua           separate CT_TEXTURE badge anchored TOPRIGHT; shown/hidden via PostHook
+src/ContextMenu.lua         right-click menu injection via ZO_PostHook
+src/Highlight.lua           separate CT_TEXTURE badge anchored TOPRIGHT; shown/hidden via ZO_PostHook
 ```
 
-**Load order matters.** `OutfitStylesFavorites.lua` must be listed first in the manifest so `OSF = {}` exists before sub-modules define methods on it. Each sub-module also declares `OSF = OSF or {}` for safety. `strings.lua` and `lang/*` must be loaded before any module that calls `GetString(...)` (e.g. `Checkbox.lua`, `ContextMenu.lua`), so all `SI_OSF_*` string IDs are registered before use.
+**Global and load order.** The global table is `OutfitStylesFavorites`. Every file uses `local OSF = OutfitStylesFavorites` as a local alias. `OutfitStylesFavorites.lua` must be listed first in the manifest so the global exists before sub-modules reference it. `strings.lua` and `lang/*` must load before any module that calls `GetString(...)`.
 
 
 ## Localization
 
-`strings.lua` defines the `SI_OSF_*` integer constants (`SI_OSF_SHOW_FAVORITES`, `SI_OSF_ADD_FAVORITE`, `SI_OSF_REMOVE_FAVORITE`). Numeric IDs are chosen well above ESO's generated range to avoid collision.
+`strings.lua` calls `ZO_CreateStringId("SI_OSF_SHOW_FAVORITES", "Show Favorites")` etc. This auto-allocates a numeric ID from ESO's custom-string pool and sets the English default — no hardcoded numbers.
 
-`lang/en.lua` registers English values at version 0 via `SafeAddString` — this is the baseline for all locales.
-
-`lang/ru.lua` registers Russian values at version 1. It returns early if `GetCVar("language.2") ~= "ru"`, so it is a no-op for non-Russian clients and the English baseline remains in effect.
+`lang/ru.lua` overrides with `SafeAddString(SI_OSF_..., "...", 1)`. Version 1 > 0 (the implicit version from `ZO_CreateStringId`), so the override is applied correctly for Russian clients. The file returns early for non-Russian clients.
 
 All UI code retrieves strings with `GetString(SI_OSF_*)`.
 
@@ -56,13 +53,13 @@ Key behaviors of the gate:
 
 `OSF.showFavorites` is session state (not persisted). It defaults to `false` on every login so the player never opens the panel to a silently filtered grid.
 
-## Context menu hook — ShowMenu trampoline
+## Context menu hook — ZO_PostHook
 
-`OnOutfitStyleEntryRightClick` calls `ClearMenu()` at the start and `ShowMenu()` at the end. A pre-hook would have items wiped; a post-hook fires too late.
+`ZO_PostHook(ZO_OUTFIT_STYLES_PANEL_KEYBOARD, "OnOutfitStyleEntryRightClick", hookFunc)`.
 
-Instead, `ZO_OutfitStyle_GridEntry_Template_Keyboard_OnMouseUp` (the global XML dispatcher) is wrapped. On a qualifying right-click it installs a one-shot replacement for the global `ShowMenu` that appends the favorites item and immediately restores `ShowMenu` before calling through.
+The base handler calls `ClearMenu()`, `AddMenuItem()` × N, then `ShowMenu(self.control)`. Our hook fires after all of that. It appends the favorites item via `AddMenuItem` and calls `ShowMenu(panel.control)` again to redisplay the updated menu. `panel.control` is the same control the base passed to `ShowMenu`.
 
-The trampoline is only installed when the entry is a real, non-empty, non-clear collectible — which is the same condition under which the base function will actually call `ShowMenu`.
+The hook guards `isEmptyCell` and `clearAction` before acting — matching the exact conditions the base function uses for its own items. It never touches `ShowMenu` globally.
 
 ## Visual highlight
 
@@ -78,7 +75,7 @@ The hook skips entries when `OSF.showFavorites` is true (all visible entries are
 
 ## Checkbox layout
 
-Created via `CreateControlFromVirtual("OSF_ShowFavorites", panel.control, "ZO_CheckButton")`, anchored `LEFT` to `showLockedCheckBox RIGHT + dynamic_offset` on the same vertical baseline.
+Created via `CreateControlFromVirtual("OutfitStylesFavorites_ShowFavorites", panel.control, "ZO_CheckButton")`, anchored `LEFT` to `showLockedCheckBox RIGHT + dynamic_offset` on the same vertical baseline.
 
 **Init (placeholder):** A conservative `ANCHOR_OFFSET` (130 px) is set immediately as a placeholder. `showLockedCheckBox` also receives a matching conservative label wrap (`ANCHOR_OFFSET - LABEL_GAP - VISUAL_GAP`) so it does not visually overflow before real coordinates are known.
 
@@ -96,15 +93,15 @@ Created via `CreateControlFromVirtual("OSF_ShowFavorites", panel.control, "ZO_Ch
 | Hook | Target | Method |
 |---|---|---|
 | Filter | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD.RefreshVisible` | Direct replacement on the singleton |
-| Context menu | `ZO_OutfitStyle_GridEntry_Template_Keyboard_OnMouseUp` | Global function replacement (wraps original) |
-| ShowMenu injection | Global `ShowMenu` | One-shot trampoline installed per right-click |
+| Context menu | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:OnOutfitStyleEntryRightClick` | `ZO_PostHook` |
 | Highlight | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:RefreshGridEntryMultiIcon` | `ZO_PostHook` |
 
 ## SavedVariables
 
 ```lua
-ZO_SavedVars:NewAccountWide("OSF_SavedVars", 1, nil, { favorites = {} })
+ZO_SavedVars:NewAccountWide("OutfitStylesFavorites_SavedVars", 1, nil, { favorites = {} }, GetWorldName())
 -- favorites = { [collectibleId (integer)] = true }
+-- Keyed by display name (default) and world name (server) — NA/EU/PTS data is separate.
 ```
 
 Account-wide is correct because outfit style unlocks are account-wide in ESO.
@@ -123,3 +120,4 @@ Account-wide is correct because outfit style unlocks are account-wide in ESO.
 - Do not replace or replicate `FilterCollectible` — it is a local closure in `RefreshVisible`; the gate operates after it
 - Do not persist `showFavorites` — session-only by design
 - Do not use `collectibleData:GetName()` or display names as keys — unstable
+- Do not overwrite or wrap the global `ShowMenu` function — breaks all other addons using context menus

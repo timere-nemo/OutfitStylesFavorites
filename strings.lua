@@ -1,10 +1,9 @@
 -- strings.lua
--- Defines SI_OSF_* string ID constants for use with GetString() and SafeAddString().
--- Numeric IDs are chosen well above ESO's generated range (~9718 as of current API)
--- to avoid collision with base-game strings.
--- Actual string values are registered in lang/en.lua (baseline) and
--- locale-specific overrides in lang/<locale>.lua.
+-- Registers SI_OSF_* string IDs using ZO_CreateStringId.
+-- ZO_CreateStringId auto-allocates a numeric ID from ESO's custom-string pool
+-- and sets the English default value — no hardcoded numbers required.
+-- Locale-specific overrides live in lang/<locale>.lua (SafeAddString, version 1).
 
-SI_OSF_SHOW_FAVORITES  = 200001
-SI_OSF_ADD_FAVORITE    = 200002
-SI_OSF_REMOVE_FAVORITE = 200003
+ZO_CreateStringId("SI_OSF_SHOW_FAVORITES",  "Show Favorites")
+ZO_CreateStringId("SI_OSF_ADD_FAVORITE",    "Add to Favorites")
+ZO_CreateStringId("SI_OSF_REMOVE_FAVORITE", "Remove from Favorites")

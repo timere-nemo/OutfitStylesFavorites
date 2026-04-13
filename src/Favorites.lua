@@ -1,4 +1,4 @@
-OSF = OSF or {}
+local OSF = OutfitStylesFavorites
 
 -- Favorites.lua
 -- Persistent storage of favorited style IDs.
@@ -10,7 +10,7 @@ local DEFAULTS = {
 }
 
 function OSF:InitializeSavedVars()
-    self.savedVars = ZO_SavedVars:NewAccountWide("OSF_SavedVars", 1, nil, DEFAULTS)
+    self.savedVars = ZO_SavedVars:NewAccountWide("OutfitStylesFavorites_SavedVars", 1, nil, DEFAULTS, GetWorldName())
 end
 
 -- Returns true when the given style ID is marked as a favorite.

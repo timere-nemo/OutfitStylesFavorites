@@ -1,4 +1,4 @@
-OSF = OSF or {}
+local OSF = OutfitStylesFavorites
 
 -- Checkbox.lua
 -- Creates the "Show Favorites" checkbox in the outfit styles panel header,
@@ -31,7 +31,7 @@ function OSF:InitializeCheckbox()
     local typeFilter = panel.typeFilterControl
 
     -- 1. Create the checkbox from the base-game ZO_CheckButton virtual template.
-    local checkBox = CreateControlFromVirtual("OSF_ShowFavorites", panel.control, "ZO_CheckButton")
+    local checkBox = CreateControlFromVirtual("OutfitStylesFavorites_ShowFavorites", panel.control, "ZO_CheckButton")
     checkBox:ClearAnchors()
     -- Placeholder anchor; corrected to a measured offset on first show.
     -- Y inherits showLocked's vertical center so both sit on the same baseline.

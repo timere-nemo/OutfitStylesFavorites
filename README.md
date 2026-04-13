@@ -31,11 +31,11 @@ The addon ships with:
 - **English** (default, all locales)
 - **Russian** (auto-applied when the ESO client language is set to Russian)
 
-All UI strings use `SafeAddString` so other locale files can override them without conflict.
+Strings are registered via `ZO_CreateStringId` — locale files can override them with `SafeAddString` without conflict.
 
 ## Notes
 
-- Favorites are stored **account-wide** — shared across all characters on the account, which matches how outfit style unlocks work in ESO
+- Favorites are stored **account-wide per server** — shared across all characters on the account, but stored separately for NA, EU, and PTS
 - The "Show Favorites" filter is **session-only** — it always resets to off on login so you never open the panel to a silently filtered grid
 
 ## Development

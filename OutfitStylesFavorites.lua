@@ -5,7 +5,8 @@
 --   - Gold-star badge on favorited entries when the filter is off
 --   - Account-wide persistent storage via ZO_SavedVars
 
-OSF = OSF or {}
+OutfitStylesFavorites = OutfitStylesFavorites or {}
+local OSF = OutfitStylesFavorites
 
 -- Runtime filter state; not persisted (defaults to off each session so the
 -- player never logs in to a silently filtered grid).

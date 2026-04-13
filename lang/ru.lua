@@ -1,8 +1,8 @@
 -- lang/ru.lua
 -- Russian string overrides.
 -- Returns immediately for non-Russian clients — SafeAddString is never called,
--- so English (version 0) remains in effect.
--- Version 1 ensures these override the English baseline (version 0) for Russian clients.
+-- so the English defaults set by ZO_CreateStringId remain in effect.
+-- Version 1 ensures these override those defaults for Russian clients.
 
 if GetCVar("language.2") ~= "ru" then return end
 

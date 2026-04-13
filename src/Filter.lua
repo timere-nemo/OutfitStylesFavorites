@@ -1,4 +1,4 @@
-OSF = OSF or {}
+local OSF = OutfitStylesFavorites
 
 -- Filter.lua
 -- Wraps ZO_OutfitStylesPanel_Keyboard:RefreshVisible on the singleton instance.

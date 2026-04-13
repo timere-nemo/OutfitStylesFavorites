@@ -1,12 +1,11 @@
 ## Title: Outfit Styles Favorites
 ## Author: @timere-nemo
-## Version: 1.0.1
+## Version: 1.1.0
 ## APIVersion: 101049
-## SavedVariables: OSF_SavedVars
+## SavedVariables: OutfitStylesFavorites_SavedVars
 
 OutfitStylesFavorites.lua
 strings.lua
-lang/en.lua
 lang/ru.lua
 src/Favorites.lua
 src/Filter.lua

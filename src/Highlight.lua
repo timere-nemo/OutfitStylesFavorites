@@ -1,4 +1,4 @@
-OSF = OSF or {}
+local OSF = OutfitStylesFavorites
 
 -- Highlight.lua
 -- Renders a gold-star badge on favorited style cells when "Show Favorites" is OFF.
