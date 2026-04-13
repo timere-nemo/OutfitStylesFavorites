@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Read version from the manifest (## Version: X.Y.Z)
-VERSION=$(grep -m1 '^## Version:' OutfitStylesFavorites.txt | awk '{print $3}')
+VERSION=$(grep -m1 '^## Version:' OutfitStylesFavorites.txt | awk '{print $3}' | tr -d '\r')
 
 if [[ -z "$VERSION" ]]; then
   echo "ERROR: could not find '## Version:' in OutfitStylesFavorites.txt" >&2
