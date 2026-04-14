@@ -1,7 +1,7 @@
 ## Title: Outfit Styles Favorites
 ## Author: @timere-nemo
-## Version: 1.1.1
-## AddOnVersion: 1
+## Version: 1.1.2
+## AddOnVersion: 2
 ## APIVersion: 101049
 ## SavedVariables: OutfitStylesFavorites_SavedVars
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2] - 2026-04-14
+
+### Changed
+
+- **Filter hook** — replaced the temporary per-refresh `AddEntry` swap with a single `ZO_PreHook` on `gridListPanelList.AddEntry`; filtering logic is now idiomatic and allocates no closures at runtime
+
 ## [1.1.1] - 2026-04-14
 
 ### Changed

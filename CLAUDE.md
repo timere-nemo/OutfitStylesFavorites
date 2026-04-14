@@ -16,7 +16,7 @@ OutfitStylesFavorites.lua   entry point — defines OutfitStylesFavorites global
 strings.lua                 SI_OSF_* IDs registered via ZO_CreateStringId (auto-allocated, English defaults)
 lang/ru.lua                 Russian overrides via SafeAddString version 1
 src/Favorites.lua           IsFavorite / AddFavorite / RemoveFavorite, SavedVars init
-src/Filter.lua              RefreshVisible wrapper with AddEntry gating
+src/Filter.lua              ZO_PreHook on gridListPanelList.AddEntry — drops non-favourites when filter is active
 src/Checkbox.lua            "Show Favorites" checkbox creation and layout
 src/ContextMenu.lua         right-click menu injection via ZO_PostHook
 src/Highlight.lua           separate CT_TEXTURE badge anchored TOPRIGHT; shown/hidden via ZO_PostHook
@@ -40,7 +40,7 @@ Always guard against `clearAction` entries before calling `:GetId()`.
 
 ## Filtering approach — AddEntry gating
 
-`ZO_OUTFIT_STYLES_PANEL_KEYBOARD.RefreshVisible` is replaced on the singleton instance. When `OSF.showFavorites` is true, the wrapper temporarily replaces `gridListPanelList.AddEntry` with a closure that drops non-favorites before they reach the grid. `AddEntry` is restored inside a `pcall` so it is always restored even if the base function errors.
+A `ZO_PreHook` on `gridListPanelList.AddEntry` is installed once during `InitializeFilter`. When `OSF.showFavorites` is true the hook returns `true` for non-favourite entries, which tells `ZO_PreHook` to suppress the original call and drop the entry from the grid.
 
 **Why not `SetGridEntryVisibilityFunction`:** that API runs after `FillRowWithEmptyCells`, so the row-padding calculation is based on the unfiltered count and produces visual artifacts (extra empty squares at section boundaries).
 
@@ -50,6 +50,7 @@ Key behaviors of the gate:
 - `clearAction` entries always pass (they have no collectible ID)
 - Empty cells are added by `FillRowWithEmptyCells` via `ZO_ScrollList_AddOperation`, not via `AddEntry` — unaffected by the gate
 - Type-0 (`NO_WEAPON_OR_ARMOR_TYPE`) entries skip the base game `FilterCollectible` but still pass through `AddEntry` and are gated correctly
+- The hook checks `OSF.showFavorites` at call time, so toggling the checkbox and calling `RefreshVisible` is all that is needed — no setup or teardown around each refresh
 
 `OSF.showFavorites` is session state (not persisted). It defaults to `false` on every login so the player never opens the panel to a silently filtered grid.
 
@@ -92,7 +93,7 @@ Created via `CreateControlFromVirtual("OutfitStylesFavorites_ShowFavorites", pan
 
 | Hook | Target | Method |
 |---|---|---|
-| Filter | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD.RefreshVisible` | Direct replacement on the singleton |
+| Filter | `gridListPanelList.AddEntry` | `ZO_PreHook` |
 | Context menu | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:OnOutfitStyleEntryRightClick` | `ZO_PostHook` |
 | Highlight | `ZO_OUTFIT_STYLES_PANEL_KEYBOARD:RefreshGridEntryMultiIcon` | `ZO_PostHook` |
 
