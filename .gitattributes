@@ -33,3 +33,4 @@ CLAUDE.md       export-ignore
 .gitignore      export-ignore
 .gitattributes  export-ignore
 release.sh      export-ignore
+.editorconfig   export-ignore
