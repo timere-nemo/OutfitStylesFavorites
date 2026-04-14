@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2026-04-14
+
+### Changed
+
+- Added `## AddOnVersion` field to the manifest to enable update detection in Minion and compatible addon managers
+
 ## [1.1.0] - 2026-04-13
 
 ### Fixed
