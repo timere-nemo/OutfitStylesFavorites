@@ -8,10 +8,10 @@ local OSF = OutfitStylesFavorites
 -- Hook: ZO_PostHook on RefreshGridEntryMultiIcon.
 -- Controls are pooled → badge is created once per control and shown/hidden each refresh.
 
-local FAVORITE_ICON  = "EsoUI/Art/TargetMarkers/Target_Gold_Star_64.dds"
-local BADGE_SIZE     = 20   -- matches visual weight of statusMultiIcon (24px); slightly smaller keeps star non-dominant
+local FAVORITE_ICON  = "EsoUI/Art/Collections/Favorite_StarOnly.dds"
+local BADGE_SIZE     = 24   -- matches visual weight of statusMultiIcon (24px)
 local BADGE_INSET_X  = 3    -- mirrors statusMultiIcon's 3px inset from its corner
-local BADGE_INSET_Y  = 5    -- aligns badge center (5+10=15) with eye icon center (3+12=15)
+local BADGE_INSET_Y  = 3    -- aligns badge center (5+10=15) with eye icon center (3+12=15)
 
 local function GetOrCreateFavoriteBadge(control)
     if control.osfFavoriteBadge then
