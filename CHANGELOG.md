@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.3] - 2026-04-17
+
+### Changed
+
+- Used the ESO Collections favorite star icon for the favorites badge in the Outfit Styles panel
+
 ## [1.1.2] - 2026-04-14
 
 ### Changed
